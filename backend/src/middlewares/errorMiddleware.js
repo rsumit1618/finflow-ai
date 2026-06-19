@@ -1,26 +1,23 @@
-import { ZodError } from "zod";
-
-export const notFoundHandler = (req, res, next) => {
+export const notFoundHandler = (req, res) => {
   res.status(404).json({
     success: false,
-    message: `Route not found: ${req.originalUrl}`,
+    message: "Route not found",
   });
 };
 
 export const globalErrorHandler = (err, req, res, next) => {
-  if (err instanceof ZodError) {
-    return res.status(400).json({
-      success: false,
-      message: "Validation failed",
-      errors: err.issues.map((issue) => ({
-        field: issue.path.join("."),
-        message: issue.message,
-      })),
-    });
+  console.error(err);
+
+  let statusCode = 500;
+  let message = "Internal Server Error";
+
+  if (err.message === "Category not found") {
+    statusCode = 404;
+    message = err.message;
   }
 
-  return res.status(err.statusCode || 500).json({
+  res.status(statusCode).json({
     success: false,
-    message: err.message || "Internal Server Error",
+    message,
   });
 };
