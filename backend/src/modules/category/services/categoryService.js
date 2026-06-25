@@ -1,9 +1,9 @@
 import {
   getCategoryById,
   createCategory,
+  updateCategoryForUser,
+  deleteCategoryForUser,
   getAllCategories,
-  updateCategory,
-  deleteCategory,
 } from "../../../repositories/categoryRepository.js";
 import { AppError } from "../../../utils/AppError.js";
 
@@ -39,7 +39,9 @@ export const updateCategoryService = async (id, userId, data) => {
     throw new AppError("No category fields provided", 400);
   }
 
-  return await updateCategory(id, data);
+  await updateCategoryForUser(id, userId, data);
+
+  return await getCategoryById(id, userId);
 };
 
 export const deleteCategoryService = async (id, userId) => {
@@ -49,5 +51,5 @@ export const deleteCategoryService = async (id, userId) => {
     throw new AppError("Category not found", 404);
   }
 
-  await deleteCategory(id);
+  await deleteCategoryForUser(id, userId);
 };

@@ -14,11 +14,26 @@ model User {
   passwordHash String
   categories   Category[]
   expenses     Expense[]
+  refreshTokens RefreshToken[]
 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   @@map("users")
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  tokenHash String
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  revokedAt DateTime?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([tokenHash])
 }
 
 model Category {

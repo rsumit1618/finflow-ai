@@ -7,6 +7,23 @@ UPDATE "public"."categories"
 SET "userId" = (SELECT "id" FROM "public"."users" ORDER BY "id" ASC LIMIT 1)
 WHERE "userId" IS NULL;
 
+-- Existing development data may contain duplicate category names.
+-- Preserve rows and make names unique before adding the per-user unique index.
+WITH ranked_categories AS (
+  SELECT
+    "id",
+    ROW_NUMBER() OVER (
+      PARTITION BY "userId", "name"
+      ORDER BY "id"
+    ) AS duplicate_rank
+  FROM "public"."categories"
+)
+UPDATE "public"."categories" AS category
+SET "name" = category."name" || ' ' || category."id"
+FROM ranked_categories
+WHERE category."id" = ranked_categories."id"
+  AND ranked_categories.duplicate_rank > 1;
+
 ALTER TABLE "public"."categories" ALTER COLUMN "userId" SET NOT NULL;
 
 ALTER TABLE "public"."categories"

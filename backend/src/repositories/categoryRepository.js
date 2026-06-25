@@ -26,19 +26,21 @@ export const getCategoryById = async (id, userId) => {
   });
 };
 
-export const updateCategory = async (id, data) => {
-  return await prisma.category.update({
+export const updateCategoryForUser = async (id, userId, data) => {
+  return prisma.category.updateMany({
     where: {
       id,
+      userId,
     },
     data,
   });
 };
 
-export const deleteCategory = async (id) => {
-  return await prisma.category.delete({
+export const deleteCategoryForUser = async (id, userId) => {
+  return prisma.category.deleteMany({
     where: {
       id,
+      userId,
     },
   });
 };

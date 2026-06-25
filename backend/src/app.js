@@ -6,6 +6,8 @@ import expenseRoutes from "./modules/expense/routes/expenseRoutes.js";
 import healthRoutes from "./modules/health/routes/healthRoutes.js";
 import { loggerMiddleware } from "./middlewares/loggerMiddleware.js";
 import { corsOptions, securityHeaders } from "./middlewares/securityMiddleware.js";
+import { requestIdMiddleware } from "./middlewares/requestIdMiddleware.js";
+import appVersion from "./constants/appConstants.js"
 import {
   globalErrorHandler,
   notFoundHandler,
@@ -17,6 +19,7 @@ app.set("trust proxy", 1);
 
 app.use(cors(corsOptions));
 app.use(securityHeaders);
+app.use(requestIdMiddleware);
 app.use(loggerMiddleware);
 app.use(express.json({ limit: "1mb" }));
 
@@ -28,6 +31,11 @@ app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/expenses", expenseRoutes);
+
+app.use(`/api/${appVersion}/health`, healthRoutes);
+app.use(`/api/${appVersion}/auth`, authRoutes);
+app.use(`/api/${appVersion}/categories`, categoryRoutes);
+app.use(`/api/${appVersion}/expenses`, expenseRoutes);
 
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
